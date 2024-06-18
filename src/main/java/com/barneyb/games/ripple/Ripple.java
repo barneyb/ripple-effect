@@ -1,7 +1,5 @@
 package com.barneyb.games.ripple;
 
-import java.util.ArrayList;
-
 public class Ripple {
 
     private static final int WALL = -1;
@@ -25,7 +23,9 @@ public class Ripple {
                           │     4     │   │       │   │
                           └───────────┴───┴───────┴───┘
                           """, 3);
-        System.out.println(render(board, 5));
+        String five = render(board, 5);
+        System.out.println(five);
+        assert five.equals(render(parse(five, 5), 5));
     }
 
     private static String render(int[][] board, int hpitch) {
