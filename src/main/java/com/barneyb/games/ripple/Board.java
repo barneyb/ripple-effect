@@ -6,17 +6,19 @@ public record Board(int[][] board) {
     private static final int OPEN = 0;
 
     public static Board parse(String ascii, int hpitch) {
+        int lpad = (hpitch - 1) / 2;
+        int rpad = hpitch - lpad - 1;
         int[][] grid = ascii.trim().lines()
-                .map(l -> {
-                    var chars = new int[2 * (l.length() - 1) / (hpitch + 1) + 1];
-                    var cs = l.toCharArray();
+                .map(String::toCharArray)
+                .map(cs -> {
+                    var chars = new int[2 * (cs.length - 1) / (hpitch + 1) + 1];
                     var c = 0;
                     chars[c++] = WALL; // edges are ALWAYS walls
                     var i = 1;
                     while (i < cs.length) {
-                        i += hpitch / 2;
+                        i += lpad;
                         chars[c++] = cs[i++] == ' ' ? OPEN : Character.digit(cs[i - 1], 10);
-                        i += hpitch / 2;
+                        i += rpad;
                         chars[c++] = cs[i++] == ' ' ? OPEN : WALL;
                     }
                     return chars;
@@ -25,6 +27,8 @@ public record Board(int[][] board) {
     }
 
     public String toString(int hpitch) {
+        int lpad = (hpitch - 1) / 2;
+        int rpad = hpitch - lpad - 1;
         var sb = new StringBuilder();
         for (int i = 0; i < board.length; i++) {
             if (i > 0) sb.append('\n');
@@ -44,9 +48,9 @@ public record Board(int[][] board) {
                 } else if (row[j] == OPEN) {
                     sb.append(" ".repeat(hpitch));
                 } else {
-                    sb.append(" ".repeat(hpitch / 2));
+                    sb.append(" ".repeat(lpad));
                     sb.append(row[j]);
-                    sb.append(" ".repeat(hpitch / 2));
+                    sb.append(" ".repeat(rpad));
                 }
             }
         }
