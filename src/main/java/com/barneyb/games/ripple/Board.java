@@ -1,9 +1,51 @@
 package com.barneyb.games.ripple;
 
-public record Board(int[][] board) {
+import java.util.Arrays;
+
+public record Board(int[][] board, int[][] cages) {
 
     private static final int WALL = -1;
     private static final int OPEN = 0;
+
+    private record Cell(int r, int c) {}
+
+    public static Board of(int[][] board) {
+        int w = board[0].length / 2;
+        int h = board.length / 2;
+        var cages = new int[10][];
+        var cageCount = 0;
+        var cells = new Cell[w * h];
+        for (int r = 1; r < board.length; r += 2) {
+            for (int c = 1; c < board[r].length; c += 2) {
+                cells[(r / 2) * w + (c / 2)] = new Cell(r, c);
+            }
+        }
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] == null) continue;
+            var cage = new int[9];
+            var n = addCell(board, cells, cage, 0, i);
+            if (cageCount == cages.length) cages = Arrays.copyOf(cages, cageCount * 2);
+            cages[cageCount++] = Arrays.copyOf(cage, n);
+        }
+        return new Board(board, Arrays.copyOf(cages, cageCount));
+    }
+
+    private static int addCell(int[][] board, Cell[] cells, int[] cage, int n, int i) {
+        var cell = cells[i];
+        if (cell == null) return n;
+        cells[i] = null;
+        cage[n++] = i;
+        int w = board[0].length / 2;
+        if (board[cell.r][cell.c - 1] == OPEN) n = addCell(board, cells, cage, n, i - 1);
+        if (board[cell.r - 1][cell.c] == OPEN) n = addCell(board, cells, cage, n, i - w);
+        if (board[cell.r][cell.c + 1] == OPEN) n = addCell(board, cells, cage, n, i + 1);
+        if (board[cell.r + 1][cell.c] == OPEN) n = addCell(board, cells, cage, n, i + w);
+        return n;
+    }
+
+    public static Board parse(String ascii) {
+        return parse(ascii, 1);
+    }
 
     public static Board parse(String ascii, int hpitch) {
         int lpad = (hpitch - 1) / 2;
@@ -23,7 +65,7 @@ public record Board(int[][] board) {
                     }
                     return chars;
                 }).toArray(int[][]::new);
-        return new Board(grid);
+        return Board.of(grid);
     }
 
     public String toString(int hpitch) {
