@@ -77,6 +77,10 @@ public record Board(int[][] board, int[][] cages) {
         return board.length / 2;
     }
 
+    public int cellCount() {
+        return width() * height();
+    }
+
     public int getCell(int cell) {
         return board[toRow(cell)][toCol(cell)];
     }
@@ -93,7 +97,11 @@ public record Board(int[][] board, int[][] cages) {
         int r = toRow(cell);
         int c = toCol(cell);
         if (board[r][c] != OPEN && board[r][c] != value)
-            throw new IllegalStateException("Already set to " + board[r][c]);
+            throw new IllegalStateException(String.format(
+                    "Cell %s is already set to %s, can't change to %s",
+                    cell,
+                    board[r][c],
+                    value));
         board[r][c] = value;
     }
 

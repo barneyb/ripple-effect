@@ -18,22 +18,39 @@ class BoardTest {
                                         | | | |
                                         +-+-+-+""";
 
-    private static final String EASY = """
-                                       ┌─────┬─────┬───────────┬───────────┬─────┐
-                                       │     │     │           │           │     │
-                                       │     ├─────┴─────┐     │     ┌─────┴─────┤
-                                       │     │           │     │     │           │
-                                       ├─────┴─────┐     ├─────┤     └─────┐     │
-                                       │           │     │     │        5  │     │
-                                       ├─────┐     └─────┴─────┤     ┌─────┴─────┤
-                                       │     │        4        │  6  │           │
-                                       ├─────┴─────┬───────────┼─────┴─────┐     │
-                                       │           │           │           │  1  │
-                                       ├─────┐     ├─────┐     │     ┌─────┴─────┤
-                                       │     │     │  1  │     │     │           │
-                                       │     └─────┘     ├─────┤     └─────┐     │
-                                       │        4        │     │           │     │
-                                       └─────────────────┴─────┴───────────┴─────┘""";
+    private static final String EASY_7x7_v1_b1_1 = """
+                                                   ┌─────┬─────┬───────────┬───────────┬─────┐
+                                                   │     │     │           │           │     │
+                                                   │     ├─────┴─────┐     │     ┌─────┴─────┤
+                                                   │     │           │     │     │           │
+                                                   ├─────┴─────┐     ├─────┤     └─────┐     │
+                                                   │           │     │     │        5  │     │
+                                                   ├─────┐     └─────┴─────┤     ┌─────┴─────┤
+                                                   │     │        4        │  6  │           │
+                                                   ├─────┴─────┬───────────┼─────┴─────┐     │
+                                                   │           │           │           │  1  │
+                                                   ├─────┐     ├─────┐     │     ┌─────┴─────┤
+                                                   │     │     │  1  │     │     │           │
+                                                   │     └─────┘     ├─────┤     └─────┐     │
+                                                   │        4        │     │           │     │
+                                                   └─────────────────┴─────┴───────────┴─────┘""";
+
+    private static final String EASY_7x7_v1_b1_5 = """
+                                                   ┌─────────────────┬─────┬─────────────────┐
+                                                   │  5     2        │     │        2        │
+                                                   │     ┌───────────┴─────┼───────────┐     │
+                                                   │     │        4        │           │     │
+                                                   │     ├─────┬─────┐     │     ┌─────┴─────┤
+                                                   │     │     │     │     │     │           │
+                                                   ├─────┴─────┘     ├─────┴─────┼─────┐     │
+                                                   │                 │           │     │  5  │
+                                                   │     ·     ┌─────┤     ┌─────┘     │     │
+                                                   │        5  │     │     │        4  │     │
+                                                   ├─────┬─────┤     ├─────┼─────┐     │     │
+                                                   │     │     │     │     │     │     │     │
+                                                   │     └─────┤     ├─────┘     └─────┴─────┤
+                                                   │           │     │        4              │
+                                                   └───────────┴─────┴───────────────────────┘""";
 
     @Test
     void parse_bitty() {
@@ -56,7 +73,7 @@ class BoardTest {
 
     @Test
     void parse_easy() {
-        var board = Board.parse(EASY, 5);
+        var board = Board.parse(EASY_7x7_v1_b1_1, 5);
         String three = board.toString(3);
         assertEquals(three, Board.parse(three, 3).toString(3));
         assertArrayEquals(new int[][]{
@@ -102,7 +119,7 @@ class BoardTest {
 
     @Test
     void northOf() {
-        var board = Board.parse(EASY, 5);
+        var board = Board.parse(EASY_7x7_v1_b1_1, 5);
         assertEquals(List.of(35, 28, 21, 14, 7, 0), list(board.northOf(42)));
         assertEquals(List.of(), list(board.northOf(0)));
         assertEquals(List.of(), list(board.northOf(3)));
@@ -117,7 +134,7 @@ class BoardTest {
 
     @Test
     void southOf() {
-        var board = Board.parse(EASY, 5);
+        var board = Board.parse(EASY_7x7_v1_b1_1, 5);
         assertEquals(List.of(7, 14, 21, 28, 35, 42), list(board.southOf(0)));
         assertEquals(List.of(42), list(board.southOf(35)));
         assertEquals(List.of(45), list(board.southOf(38)));
@@ -129,7 +146,7 @@ class BoardTest {
 
     @Test
     void eastOf() {
-        var board = Board.parse(EASY, 5);
+        var board = Board.parse(EASY_7x7_v1_b1_1, 5);
         assertEquals(List.of(1, 2, 3, 4, 5, 6), list(board.eastOf(0)));
         assertEquals(List.of(), list(board.eastOf(6)));
         assertEquals(List.of(12, 13), list(board.eastOf(11)));
@@ -137,7 +154,7 @@ class BoardTest {
 
     @Test
     void westOf() {
-        var board = Board.parse(EASY, 5);
+        var board = Board.parse(EASY_7x7_v1_b1_1, 5);
         assertEquals(List.of(5, 4, 3, 2, 1, 0), list(board.westOf(6)));
         assertEquals(List.of(), list(board.westOf(0)));
         assertEquals(List.of(8, 7), list(board.westOf(9)));
