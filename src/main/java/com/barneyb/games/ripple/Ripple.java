@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
 
@@ -17,7 +18,7 @@ public class Ripple {
     public static void main(String[] args) {
         var board = Board.parse(TOUGH_8x8_v1_b9_7,
                                 5);
-        new Ripple(board);
+        new Ripple(board).solve();
         System.out.println(board.toString(5));
     }
 
@@ -33,7 +34,6 @@ public class Ripple {
         //noinspection unchecked
         candidatesByCell = new Set[cellCount];
         initialize();
-        doStrats();
     }
 
     @FunctionalInterface
@@ -43,15 +43,16 @@ public class Ripple {
 
     }
 
-    private void doStrats() {
+    void solve() {
         //noinspection StatementWithEmptyBody
         while (Stream.<Strat>of(
                 this::cancels,
-                this::singletons
+                this::singletons,
+                this::pairCorners
         ).anyMatch(Strat::run)) {}
     }
 
-    private boolean cancels() {
+    boolean cancels() {
         var didSomething = false;
         while (!queue.isEmpty()) {
             var cell = queue.remove();
@@ -59,26 +60,21 @@ public class Ripple {
             var cs = candidatesByCell[cell];
             if (cs.size() != 1) continue;
             int value = cs.iterator().next();
-            System.out.println("queue lock: " + cell + " = " + value);
+            System.out.println("one candidate: " + cell + " = " + value);
             lockCell(cell, value);
             didSomething = true;
         }
         return didSomething;
     }
 
-    private boolean singletons() {
+    boolean singletons() {
         var didSomething = false;
         for (var cage : board.cages()) {
-            var hist = new Hist();
-            for (int c : cage) {
-                Set<Integer> ccs = candidatesByCell[c];
-                if (ccs.size() > 1)
-                    hist.addAll(ccs);
-            }
-            for (int v : hist.singletons()) {
+            var hist = getHist(cage);
+            for (int v : hist.withCount(1)) {
                 for (int c : cage) {
                     if (candidatesByCell[c].contains(v)) {
-                        System.out.println("singleton lock: " + c + " = " + v);
+                        System.out.println("one cell in cage: " + c + " = " + v);
                         lockCell(c, v);
                         didSomething = true;
                     }
@@ -86,6 +82,49 @@ public class Ripple {
             }
         }
         return didSomething;
+    }
+
+    boolean pairCorners() {
+        var didSomething = new AtomicBoolean();
+        for (var cage : board.cages()) {
+            var hist = getHist(cage);
+            for (int v : hist.withCount(2)) {
+                int a = -1, b = -1;
+                for (int c : cage) {
+                    if (candidatesByCell[c].contains(v)) {
+                        if (a < 0) a = c;
+                        else b = c;
+                    }
+                }
+                assert a > 0;
+                assert b > 0;
+                var aSees = new HashSet<Integer>();
+                board.northOf(a).limit(v).forEach(aSees::add);
+                board.southOf(a).limit(v).forEach(aSees::add);
+                board.eastOf(a).limit(v).forEach(aSees::add);
+                board.westOf(a).limit(v).forEach(aSees::add);
+                IntConsumer work = c -> {
+                    System.out.println("pair remove: " + c + " = " + v);
+                    removeCandidate(c, v);
+                    didSomething.set(true);
+                };
+                board.northOf(b).limit(v).filter(aSees::contains).forEach(work);
+                board.southOf(b).limit(v).filter(aSees::contains).forEach(work);
+                board.eastOf(b).limit(v).filter(aSees::contains).forEach(work);
+                board.westOf(b).limit(v).filter(aSees::contains).forEach(work);
+            }
+        }
+        return didSomething.get();
+    }
+
+    private Hist getHist(int[] cage) {
+        var hist = new Hist();
+        for (int c : cage) {
+            Set<Integer> ccs = candidatesByCell[c];
+            if (ccs.size() > 1)
+                hist.addAll(ccs);
+        }
+        return hist;
     }
 
     private void lockCell(Integer cell, int value) {

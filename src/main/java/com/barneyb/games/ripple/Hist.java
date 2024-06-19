@@ -22,15 +22,15 @@ public class Hist {
         vs.forEach(this::add);
     }
 
-    public int[] singletons() {
+    public int[] withCount(int count) {
         var n = 0;
         var result = new int[]{};
-        for (int b : hist) {
-            if (b > 0 && hist[b] == 1) {
+        for (int i = 0; i < hist.length; i++) {
+            if (i > 0 && hist[i] == count) {
                 if (n == result.length) {
                     result = Arrays.copyOf(result, n * 2 + 1);
                 }
-                result[n++] = b;
+                result[n++] = i;
             }
         }
         return n < result.length
