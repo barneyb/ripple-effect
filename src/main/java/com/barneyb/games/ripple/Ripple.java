@@ -1,5 +1,6 @@
 package com.barneyb.games.ripple;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,6 +8,7 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.IntConsumer;
 
 public class Ripple {
 
@@ -47,30 +49,14 @@ public class Ripple {
             if (cs.size() != 1) continue;
             int value = cs.iterator().next();
             board.setCell(cell, value);
-            System.out.printf("set %d to %d%n", cell, value);
-            // clear the cage
-            for (int c : cagesByCell.get(cell)) {
-                System.out.printf("CAGE remove %d from %d%n", value, c);
-                if (c != cell) {
-                    removeCandidate(c, value);
-                }
-            }
-            board.northOf(cell).limit(value).forEach(c -> {
-                System.out.printf("NORTH remove %d from %d%n", value, c);
-                removeCandidate(c, value);
-            });
-            board.southOf(cell).limit(value).forEach(c -> {
-                System.out.printf("SOUTH remove %d from %d%n", value, c);
-                removeCandidate(c, value);
-            });
-            board.eastOf(cell).limit(value).forEach(c -> {
-                System.out.printf("EAST remove %d from %d%n", value, c);
-                removeCandidate(c, value);
-            });
-            board.westOf(cell).limit(value).forEach(c -> {
-                System.out.printf("WEST remove %d from %d%n", value, c);
-                removeCandidate(c, value);
-            });
+            IntConsumer remove = c -> removeCandidate(c, value);
+            Arrays.stream(cagesByCell.get(cell))
+                    .filter(c -> c != cell)
+                    .forEach(remove);
+            board.northOf(cell).limit(value).forEach(remove);
+            board.southOf(cell).limit(value).forEach(remove);
+            board.eastOf(cell).limit(value).forEach(remove);
+            board.westOf(cell).limit(value).forEach(remove);
         }
     }
 
