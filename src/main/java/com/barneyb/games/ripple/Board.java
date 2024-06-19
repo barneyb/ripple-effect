@@ -131,31 +131,62 @@ public record Board(int[][] board, int[][] cages) {
         int lpad = (hpitch - 1) / 2;
         int rpad = hpitch - lpad - 1;
         var sb = new StringBuilder();
-        for (int i = 0; i < board.length; i++) {
-            if (i > 0) sb.append('\n');
-            var row = board[i];
-            for (int j = 0; j < row.length; j++) {
-                if (i % 2 == 0) {
-                    if (j % 2 == 0) {
+        for (int r = 0; r < board.length; r++) {
+            if (r > 0) sb.append('\n');
+            var row = board[r];
+            for (int c = 0; c < row.length; c++) {
+                if (r % 2 == 0) {
+                    if (c % 2 == 0) {
                         // corner
-                        sb.append(row[j] == WALL ? '+' : '·');
+                        sb.append(cornerChar(r, c));
                     } else {
                         // horizontal
-                        sb.append((row[j] == WALL ? "-" : " ").repeat(hpitch));
+                        sb.append((row[c] == WALL ? "─" : " ").repeat(hpitch));
                     }
-                } else if (j % 2 == 0) {
+                } else if (c % 2 == 0) {
                     // vertical
-                    sb.append(row[j] == WALL ? '|' : ' ');
-                } else if (row[j] == OPEN) {
+                    sb.append(row[c] == WALL ? '│' : ' ');
+                } else if (row[c] == OPEN) {
                     sb.append(" ".repeat(hpitch));
                 } else {
                     sb.append(" ".repeat(lpad));
-                    sb.append(row[j]);
+                    sb.append(row[c]);
                     sb.append(" ".repeat(rpad));
                 }
             }
         }
         return sb.toString();
+    }
+
+    private char cornerChar(int r, int c) {
+        var v = 0;
+        if (r > 0 && board[r - 1][c] == WALL) {
+            v |= 0b0001; // north
+        }
+        if (c > 0 && board[r][c - 1] == WALL) {
+            v |= 0b0010; // west
+        }
+        if (r < board.length - 1 && board[r + 1][c] == WALL) {
+            v |= 0b0100; // south
+        }
+        if (c < board[r].length - 1 && board[r][c + 1] == WALL) {
+            v |= 0b1000; // east
+        }
+        return switch (v) {
+            case 0b0000 -> '·';
+            case 0b0011 -> '┘';
+            case 0b0101 -> '│';
+            case 0b0110 -> '┐';
+            case 0b0111 -> '┤';
+            case 0b1001 -> '└';
+            case 0b1010 -> '─';
+            case 0b1011 -> '┴';
+            case 0b1100 -> '┌';
+            case 0b1101 -> '├';
+            case 0b1110 -> '┬';
+            case 0b1111 -> '┼';
+            default -> '@';
+        };
     }
 
     @Override

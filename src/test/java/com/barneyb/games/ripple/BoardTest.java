@@ -38,7 +38,12 @@ class BoardTest {
     @Test
     void parse_bitty() {
         var board = Board.parse(BITTY, 1);
-        assertEquals(BITTY, board.toString());
+        assertEquals("""
+                     ┌───────┬───┐
+                     │       │   │
+                     │   ┌───┤   │
+                     │   │   │   │
+                     └───┴───┴───┘""", board.toString(3));
         assertArrayEquals(new int[][]{
                                   { 0, 1, 3 },
                                   { 2, 5 },
