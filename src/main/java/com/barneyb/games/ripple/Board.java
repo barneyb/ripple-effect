@@ -1,11 +1,16 @@
 package com.barneyb.games.ripple;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
+/**
+ * @param board half-pitch representation of the board
+ * @param cages array of array of cell indexes w/in the same cage
+ */
 public record Board(int[][] board, int[][] cages) {
 
     private static final int WALL = -1;
-    private static final int OPEN = 0;
+    public static final int OPEN = 0;
 
     private record Cell(int r, int c) {}
 
@@ -43,10 +48,6 @@ public record Board(int[][] board, int[][] cages) {
         return n;
     }
 
-    public static Board parse(String ascii) {
-        return parse(ascii, 1);
-    }
-
     public static Board parse(String ascii, int hpitch) {
         int lpad = (hpitch - 1) / 2;
         int rpad = hpitch - lpad - 1;
@@ -66,6 +67,64 @@ public record Board(int[][] board, int[][] cages) {
                     return chars;
                 }).toArray(int[][]::new);
         return Board.of(grid);
+    }
+
+    public int width() {
+        return board[0].length / 2;
+    }
+
+    public int height() {
+        return board.length / 2;
+    }
+
+    public int getCell(int cell) {
+        return board[toRow(cell)][toCol(cell)];
+    }
+
+    private int toCol(int cell) {
+        return cell % width() * 2 + 1;
+    }
+
+    private int toRow(int cell) {
+        return cell / width() * 2 + 1;
+    }
+
+    public void setCell(int cell, int value) {
+        int r = toRow(cell);
+        int c = toCol(cell);
+        if (board[r][c] != OPEN && board[r][c] != value)
+            throw new IllegalStateException("Already set to " + board[r][c]);
+        board[r][c] = value;
+    }
+
+    public IntStream northOf(int cell) {
+        return downTo(cell, width(), 0);
+    }
+
+    private IntStream downTo(int anchor, int step, int min) {
+        return IntStream.iterate(anchor - step,
+                                 n -> n >= min,
+                                 n -> n - step);
+    }
+
+    public IntStream southOf(int cell) {
+        int w = width();
+        return upTo(cell, w, w * height());
+    }
+
+    private IntStream upTo(int cell, int step, int max) {
+        return IntStream.iterate(cell + step,
+                                 n -> n < max,
+                                 n -> n + step);
+    }
+
+    public IntStream eastOf(int cell) {
+        int w = width();
+        return upTo(cell, 1, cell + w - (cell % w));
+    }
+
+    public IntStream westOf(int cell) {
+        return downTo(cell, 1, cell - cell % width());
     }
 
     public String toString(int hpitch) {
