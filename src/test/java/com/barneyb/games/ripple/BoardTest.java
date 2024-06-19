@@ -6,51 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import static com.barneyb.games.ripple.Boards.BITTY;
+import static com.barneyb.games.ripple.Boards.EASY_7x7_v1_b1_1;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BoardTest {
-
-    private static final String BITTY = """
-                                        +-+-+-+
-                                        |   | |
-                                        + +-+ +
-                                        | | | |
-                                        +-+-+-+""";
-
-    private static final String EASY_7x7_v1_b1_1 = """
-                                                   ┌─────┬─────┬───────────┬───────────┬─────┐
-                                                   │     │     │           │           │     │
-                                                   │     ├─────┴─────┐     │     ┌─────┴─────┤
-                                                   │     │           │     │     │           │
-                                                   ├─────┴─────┐     ├─────┤     └─────┐     │
-                                                   │           │     │     │        5  │     │
-                                                   ├─────┐     └─────┴─────┤     ┌─────┴─────┤
-                                                   │     │        4        │  6  │           │
-                                                   ├─────┴─────┬───────────┼─────┴─────┐     │
-                                                   │           │           │           │  1  │
-                                                   ├─────┐     ├─────┐     │     ┌─────┴─────┤
-                                                   │     │     │  1  │     │     │           │
-                                                   │     └─────┘     ├─────┤     └─────┐     │
-                                                   │        4        │     │           │     │
-                                                   └─────────────────┴─────┴───────────┴─────┘""";
-
-    private static final String EASY_7x7_v1_b1_5 = """
-                                                   ┌─────────────────┬─────┬─────────────────┐
-                                                   │  5     2        │     │        2        │
-                                                   │     ┌───────────┴─────┼───────────┐     │
-                                                   │     │        4        │           │     │
-                                                   │     ├─────┬─────┐     │     ┌─────┴─────┤
-                                                   │     │     │     │     │     │           │
-                                                   ├─────┴─────┘     ├─────┴─────┼─────┐     │
-                                                   │                 │           │     │  5  │
-                                                   │     ·     ┌─────┤     ┌─────┘     │     │
-                                                   │        5  │     │     │        4  │     │
-                                                   ├─────┬─────┤     ├─────┼─────┐     │     │
-                                                   │     │     │     │     │     │     │     │
-                                                   │     └─────┤     ├─────┘     └─────┴─────┤
-                                                   │           │     │        4              │
-                                                   └───────────┴─────┴───────────────────────┘""";
 
     @Test
     void parse_bitty() {

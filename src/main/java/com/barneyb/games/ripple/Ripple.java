@@ -10,27 +10,12 @@ import java.util.Set;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
 
+import static com.barneyb.games.ripple.Boards.TOUGH_8x8_v1_b9_7;
+
 public class Ripple {
 
     public static void main(String[] args) {
-        var board = Board.parse("""
-                                ┌───────────────────────┬─────────────────┬─────┐
-                                │                       │                 │  1  │
-                                ├─────┬─────┬───────────┴─────┬───────────┘     │
-                                │     │     │                 │                 │
-                                │     │     ├───────────┬─────┤     ┌───────────┤
-                                │     │  3  │           │     │     │  6        │
-                                ├─────┘     │     ┌─────┴─────┴─────┘     ┌─────┤
-                                │           │     │                       │     │
-                                │     ┌─────┘     ├─────┬─────┐     ┌─────┴─────┤
-                                │     │           │  4  │     │     │  2        │
-                                ├─────┼─────┬─────┘     └─────┼─────┴─────┐     │
-                                │     │     │                 │           │     │
-                                │     │     └─────┬───────────┴─────┐     ├─────┤
-                                │     │           │                 │     │     │
-                                ├─────┘     ┌─────┴─────────────────┤     │     │
-                                │           │                       │     │     │
-                                └───────────┴───────────────────────┴─────┴─────┘""",
+        var board = Board.parse(TOUGH_8x8_v1_b9_7,
                                 5);
         new Ripple(board);
         System.out.println(board.toString(5));
@@ -54,17 +39,16 @@ public class Ripple {
     @FunctionalInterface
     private interface Strat {
 
-        boolean doit();
+        boolean run();
 
     }
 
     private void doStrats() {
-        if (Stream.<Strat>of(
+        //noinspection StatementWithEmptyBody
+        while (Stream.<Strat>of(
                 this::cancels,
                 this::singletons
-        ).anyMatch(Strat::doit)) {
-            doStrats();
-        }
+        ).anyMatch(Strat::run)) {}
     }
 
     private boolean cancels() {
