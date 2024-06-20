@@ -104,9 +104,10 @@ public class Ripple {
                 board.eastOf(a).limit(v).forEach(aSees::add);
                 board.westOf(a).limit(v).forEach(aSees::add);
                 IntConsumer work = c -> {
-                    System.out.println("pair remove: " + c + " = " + v);
-                    removeCandidate(c, v);
-                    didSomething.set(true);
+                    if (removeCandidate(c, v)) {
+                        System.out.println("pair remove: " + c + " = " + v);
+                        didSomething.set(true);
+                    }
                 };
                 board.northOf(b).limit(v).filter(aSees::contains).forEach(work);
                 board.southOf(b).limit(v).filter(aSees::contains).forEach(work);
@@ -119,11 +120,8 @@ public class Ripple {
 
     private Hist getHist(int[] cage) {
         var hist = new Hist();
-        for (int c : cage) {
-            Set<Integer> ccs = candidatesByCell[c];
-            if (ccs.size() > 1)
-                hist.addAll(ccs);
-        }
+        for (int c : cage)
+            hist.addAll(candidatesByCell[c]);
         return hist;
     }
 
@@ -167,10 +165,12 @@ public class Ripple {
         return ints;
     }
 
-    private void removeCandidate(int c, int value) {
+    private boolean removeCandidate(int c, int value) {
         if (candidatesByCell[c].remove(value)) {
             queue.add(c);
+            return true;
         }
+        return false;
     }
 
 }
