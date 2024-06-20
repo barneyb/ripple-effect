@@ -116,7 +116,7 @@ public class Ripple {
                 for (int v : candidatesByCell[c]) {
                     var cs = cellsByCandidate[v];
                     if (cs == null)
-                        cs = cellsByCandidate[v] = new int[1];
+                        cs = cellsByCandidate[v] = new int[2];
                     else if (counts[v] == cs.length)
                         cs = cellsByCandidate[v] = Arrays.copyOf(cs, cs.length * 2);
                     cs[counts[v]++] = c;
@@ -138,7 +138,8 @@ public class Ripple {
                 assert allSee != null;
                 for (int c : allSee) {
                     if (removeCandidate(c, v)) {
-                        System.out.println("visible to all: " + c + " = " + v);
+                        String vizTo = Arrays.toString(Arrays.copyOf(cells, counts[v]));
+                        System.out.println("visible to " + vizTo + ": " + c + " != " + v);
                         didSomething = true;
                     }
                 }
