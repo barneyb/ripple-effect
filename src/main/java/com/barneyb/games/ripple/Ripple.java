@@ -1,5 +1,6 @@
 package com.barneyb.games.ripple;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,18 +8,29 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntConsumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static com.barneyb.games.ripple.Boards.TOUGH_8x8_v1_b9_7;
+import static com.barneyb.games.ripple.Boards.SUPER_TOUGH_10x10_v1_b100_2;
 
 public class Ripple {
 
     public static void main(String[] args) {
-        var board = Board.parse(TOUGH_8x8_v1_b9_7,
+        var board = Board.parse(SUPER_TOUGH_10x10_v1_b100_2,
                                 5);
-        new Ripple(board).solve();
+        var r = new Ripple(board);
+        r.solve();
+        if (!board.isSolved()) {
+            for (int c = 0, l = board.cellCount(); c < l; c++) {
+                int v = board.getCell(c);
+                if (v == Board.OPEN) {
+                    System.out.printf("  %s: %s%n", c, r.candidatesByCell[c]);
+                } else {
+                    System.out.printf("✔ %s: %s%n", c, v);
+                }
+            }
+        }
         System.out.println(board.toString(5));
     }
 
@@ -44,15 +56,17 @@ public class Ripple {
     }
 
     void solve() {
-        //noinspection StatementWithEmptyBody
-        while (Stream.<Strat>of(
-                this::cancels,
-                this::singletons,
-                this::pairCorners
-        ).anyMatch(Strat::run)) {}
+        for (int i = 1; ; i++) {
+            System.out.printf("- Round %d -%s%n", i, "-".repeat(20));
+            if (Stream.<Strat>of(
+                    this::singleCandidate,
+                    this::singleCellInCage,
+                    this::visibleToAllPotentials
+            ).noneMatch(s -> !board.isSolved() && s.run())) break;
+        }
     }
 
-    boolean cancels() {
+    boolean singleCandidate() {
         var didSomething = false;
         while (!queue.isEmpty()) {
             var cell = queue.remove();
@@ -67,7 +81,7 @@ public class Ripple {
         return didSomething;
     }
 
-    boolean singletons() {
+    boolean singleCellInCage() {
         var didSomething = false;
         for (var cage : board.cages()) {
             var hist = getHist(cage);
@@ -84,38 +98,45 @@ public class Ripple {
         return didSomething;
     }
 
-    boolean pairCorners() {
-        var didSomething = new AtomicBoolean();
+    boolean visibleToAllPotentials() {
+        var didSomething = false;
         for (var cage : board.cages()) {
-            var hist = getHist(cage);
-            for (int v : hist.withCount(2)) {
-                int a = -1, b = -1;
-                for (int c : cage) {
-                    if (candidatesByCell[c].contains(v)) {
-                        if (a < 0) a = c;
-                        else b = c;
-                    }
+            var cellsByCandidate = new int[cage.length + 1][];
+            var counts = new int[cage.length + 1];
+            for (int c : cage) {
+                if (board.getCell(c) != Board.OPEN) continue;
+                for (int v : candidatesByCell[c]) {
+                    var cs = cellsByCandidate[v];
+                    if (cs == null)
+                        cs = cellsByCandidate[v] = new int[1];
+                    else if (counts[v] == cs.length)
+                        cs = cellsByCandidate[v] = Arrays.copyOf(cs, cs.length * 2);
+                    cs[counts[v]++] = c;
                 }
-                assert a > 0;
-                assert b > 0;
-                var aSees = new HashSet<Integer>();
-                board.northOf(a).limit(v).forEach(aSees::add);
-                board.southOf(a).limit(v).forEach(aSees::add);
-                board.eastOf(a).limit(v).forEach(aSees::add);
-                board.westOf(a).limit(v).forEach(aSees::add);
-                IntConsumer work = c -> {
+            }
+            for (int v = 0; v < counts.length; v++) {
+                if (counts[v] < 2) continue;
+                var cells = cellsByCandidate[v];
+                Set<Integer> allSee = null;
+                for (int c = 0; c < counts[v]; c++) {
+                    var iSee = new HashSet<Integer>();
+                    board.northOf(cells[c]).limit(v).forEach(iSee::add);
+                    board.southOf(cells[c]).limit(v).forEach(iSee::add);
+                    board.eastOf(cells[c]).limit(v).forEach(iSee::add);
+                    board.westOf(cells[c]).limit(v).forEach(iSee::add);
+                    if (allSee == null) allSee = iSee;
+                    else allSee.removeIf(Predicate.not(iSee::contains));
+                }
+                assert allSee != null;
+                for (int c : allSee) {
                     if (removeCandidate(c, v)) {
                         System.out.println("pair remove: " + c + " = " + v);
-                        didSomething.set(true);
+                        didSomething = true;
                     }
-                };
-                board.northOf(b).limit(v).filter(aSees::contains).forEach(work);
-                board.southOf(b).limit(v).filter(aSees::contains).forEach(work);
-                board.eastOf(b).limit(v).filter(aSees::contains).forEach(work);
-                board.westOf(b).limit(v).filter(aSees::contains).forEach(work);
+                }
             }
         }
-        return didSomething.get();
+        return didSomething;
     }
 
     private Hist getHist(int[] cage) {

@@ -13,15 +13,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RippleTest {
 
     @Test
-    void pairCorners() {
+    void visibleToAllPotentials() {
         var board = Board.parse(TOUGH_8x8_v1_b9_7,
                                 5);
         var r = new Ripple(board);
-        assertTrue(r.cancels());
+        assertTrue(r.singleCandidate());
         assertEquals(Board.OPEN, board.getCell(53));
         System.out.println(board.toString(5));
-        assertTrue(r.pairCorners());
-        assertTrue(r.cancels());
+        assertTrue(r.visibleToAllPotentials());
+        assertTrue(r.singleCandidate());
         assertEquals(3, board.getCell(53));
         System.out.println(board.toString(5));
     }
@@ -102,6 +102,10 @@ class RippleTest {
     }
 
     private static void assertSolution(Board board, int[] solution) {
+        if (!board.isSolved()) {
+            System.out.println(board.toString(5));
+            throw new AssertionError("Board is not solved?!");
+        }
         for (int c = board.cellCount() - 1; c >= 0; c--) {
             assertEquals(solution[c],
                          board.getCell(c),

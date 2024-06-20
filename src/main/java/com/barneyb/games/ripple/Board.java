@@ -135,6 +135,12 @@ public record Board(int[][] board, int[][] cages) {
         return downTo(cell, 1, cell - cell % width());
     }
 
+    public boolean isSolved() {
+        for (int c = cellCount() - 1; c >= 0; c--)
+            if (getCell(c) == OPEN) return false;
+        return true;
+    }
+
     public String toString(int hpitch) {
         int lpad = (hpitch - 1) / 2;
         int rpad = hpitch - lpad - 1;
