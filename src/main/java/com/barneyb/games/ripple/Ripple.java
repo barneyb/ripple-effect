@@ -12,13 +12,13 @@ import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static com.barneyb.games.ripple.Boards.SUPER_TOUGH_10x10_v1_b100_2;
+import static com.barneyb.games.ripple.Boards.SUPER_TOUGH_10x10_v2_b100_12;
 import static java.util.Collections.singleton;
 
 public class Ripple {
 
     public static void main(String[] args) {
-        var board = Board.parse(SUPER_TOUGH_10x10_v1_b100_2,
+        var board = Board.parse(SUPER_TOUGH_10x10_v2_b100_12,
                                 5);
         var r = new Ripple(board);
         r.solve();
