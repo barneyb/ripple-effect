@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import static com.barneyb.games.ripple.Boards.BITTY;
 import static com.barneyb.games.ripple.Boards.CHALLENGING_8x8_v1_b1_1;
 import static com.barneyb.games.ripple.Boards.EASY_7x7_v1_b1_1;
+import static com.barneyb.games.ripple.Boards.SUPER_TOUGH_10x10_v1_b100_2;
 import static com.barneyb.games.ripple.Boards.SUPER_TOUGH_10x10_v1_b1_1;
 import static com.barneyb.games.ripple.Boards.TOUGH_8x8_v1_b9_7;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -98,6 +99,24 @@ class RippleTest {
                 1, 4, 1, 3, 1, 2, 1, 5, 4, 2,
                 4, 1, 3, 2, 5, 1, 2, 4, 1, 3,
                 1, 2, 6, 1, 2, 4, 3, 1, 2, 1, };
+        assertSolution(board, solution);
+    }
+
+    @Test
+    void super_tough_10x10_v1_b100_2() {
+        var board = Board.parse(SUPER_TOUGH_10x10_v1_b100_2, 5);
+        new Ripple(board).solve();
+        var solution = new int[]{
+                4, 6, 1, 5, 3, 4, 1, 2, 3, 5,
+                5, 2, 6, 4, 2, 1, 5, 3, 7, 6,
+                2, 5, 3, 1, 6, 2, 4, 5, 2, 3,
+                3, 4, 1, 2, 1, 3, 1, 6, 4, 2,
+                1, 3, 5, 6, 4, 1, 3, 1, 5, 4,
+                4, 1, 2, 3, 5, 6, 1, 2, 3, 1,
+                6, 2, 3, 5, 1, 4, 2, 3, 6, 5,
+                5, 6, 4, 2, 3, 1, 5, 4, 2, 1,
+                2, 1, 6, 4, 2, 5, 3, 1, 4, 6,
+                3, 5, 2, 1, 4, 2, 6, 5, 3, 4, };
         assertSolution(board, solution);
     }
 

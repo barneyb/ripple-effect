@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.barneyb.games.ripple.Boards.SUPER_TOUGH_10x10_v1_b100_2;
+import static java.util.Collections.singleton;
 
 public class Ripple {
 
@@ -63,6 +64,10 @@ public class Ripple {
                     this::singleCellInCage,
                     this::visibleToAllPotentials
             ).noneMatch(s -> !board.isSolved() && s.run())) break;
+            if (i > 100) {
+                System.out.println("Cowardly refusing to continue past " + i + " rounds");
+                break;
+            }
         }
     }
 
@@ -70,7 +75,7 @@ public class Ripple {
         var didSomething = false;
         while (!queue.isEmpty()) {
             var cell = queue.remove();
-            if (board.getCell(cell) != Board.OPEN) continue;
+            if (!board.isOpen(cell)) continue;
             var cs = candidatesByCell[cell];
             if (cs.size() != 1) continue;
             int value = cs.iterator().next();
@@ -84,7 +89,10 @@ public class Ripple {
     boolean singleCellInCage() {
         var didSomething = false;
         for (var cage : board.cages()) {
-            var hist = getHist(cage);
+            var hist = new Hist();
+            for (int c : cage)
+                if (board.isOpen(c))
+                    hist.addAll(candidatesByCell[c]);
             for (int v : hist.withCount(1)) {
                 for (int c : cage) {
                     if (candidatesByCell[c].contains(v)) {
@@ -104,7 +112,7 @@ public class Ripple {
             var cellsByCandidate = new int[cage.length + 1][];
             var counts = new int[cage.length + 1];
             for (int c : cage) {
-                if (board.getCell(c) != Board.OPEN) continue;
+                if (!board.isOpen(c)) continue;
                 for (int v : candidatesByCell[c]) {
                     var cs = cellsByCandidate[v];
                     if (cs == null)
@@ -130,7 +138,7 @@ public class Ripple {
                 assert allSee != null;
                 for (int c : allSee) {
                     if (removeCandidate(c, v)) {
-                        System.out.println("pair remove: " + c + " = " + v);
+                        System.out.println("visible to all: " + c + " = " + v);
                         didSomething = true;
                     }
                 }
@@ -139,15 +147,8 @@ public class Ripple {
         return didSomething;
     }
 
-    private Hist getHist(int[] cage) {
-        var hist = new Hist();
-        for (int c : cage)
-            hist.addAll(candidatesByCell[c]);
-        return hist;
-    }
-
     private void lockCell(Integer cell, int value) {
-        removeCandidate(cell, value);
+        candidatesByCell[cell] = singleton(value);
         board.setCell(cell, value);
         IntConsumer remove = c -> removeCandidate(c, value);
         for (int c : cagesByCell[cell])

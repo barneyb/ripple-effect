@@ -85,6 +85,10 @@ public record Board(int[][] board, int[][] cages) {
         return board[toRow(cell)][toCol(cell)];
     }
 
+    public boolean isOpen(int cell) {
+        return getCell(cell) == OPEN;
+    }
+
     private int toCol(int cell) {
         return cell % width() * 2 + 1;
     }
