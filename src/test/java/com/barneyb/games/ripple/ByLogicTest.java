@@ -2,6 +2,7 @@ package com.barneyb.games.ripple;
 
 import org.junit.jupiter.api.Test;
 
+import static com.barneyb.games.ripple.Assertions.assertSolution;
 import static com.barneyb.games.ripple.Boards.BITTY;
 import static com.barneyb.games.ripple.Boards.KD_CHALLENGING_8x8_v1_b1_1;
 import static com.barneyb.games.ripple.Boards.KD_EASY_7x7_v1_b1_1;
@@ -11,13 +12,13 @@ import static com.barneyb.games.ripple.Boards.KD_TOUGH_8x8_v1_b9_7;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RippleTest {
+class ByLogicTest {
 
     @Test
     void visibleToAllPotentials() {
         var board = Board.parse(KD_TOUGH_8x8_v1_b9_7,
                                 5);
-        var r = new Ripple(board);
+        var r = new ByLogic(board);
         assertTrue(r.singleCandidate());
         assertEquals(Board.OPEN, board.getCell(53));
         System.out.println(board.toString(5));
@@ -30,7 +31,7 @@ class RippleTest {
     @Test
     void bitty() {
         var board = Board.parse(BITTY, 1);
-        new Ripple(board).solve();
+        new ByLogic(board).solve();
         var solution = new int[]{
                 1, 2, 1,
                 3, 1, 2, };
@@ -40,7 +41,7 @@ class RippleTest {
     @Test
     void easy_7x7_v1_b1_1() {
         var board = Board.parse(KD_EASY_7x7_v1_b1_1, 5);
-        new Ripple(board).solve();
+        new ByLogic(board).solve();
         var solution = new int[]{
                 2, 1, 3, 1, 4, 2, 1,
                 1, 3, 1, 2, 1, 3, 2,
@@ -55,7 +56,7 @@ class RippleTest {
     @Test
     void challenging_8x8_v1_b1_1() {
         var board = Board.parse(KD_CHALLENGING_8x8_v1_b1_1, 5);
-        new Ripple(board).solve();
+        new ByLogic(board).solve();
         var solution = new int[]{
                 2, 3, 1, 2, 4, 5, 2, 1,
                 6, 1, 3, 1, 2, 4, 3, 2,
@@ -71,7 +72,7 @@ class RippleTest {
     @Test
     void tough_8x8_v1_b9_7() {
         var board = Board.parse(KD_TOUGH_8x8_v1_b9_7, 5);
-        new Ripple(board).solve();
+        new ByLogic(board).solve();
         var solution = new int[]{
                 3, 4, 2, 1, 3, 1, 2, 1,
                 1, 2, 1, 3, 2, 4, 5, 2,
@@ -87,7 +88,7 @@ class RippleTest {
     @Test
     void super_tough_10x10_v1_b1_1() {
         var board = Board.parse(KD_SUPER_TOUGH_10x10_v1_b1_1, 5);
-        new Ripple(board).solve();
+        new ByLogic(board).solve();
         var solution = new int[]{
                 3, 1, 2, 1, 5, 4, 3, 6, 1, 2,
                 1, 5, 4, 2, 1, 3, 1, 2, 4, 3,
@@ -105,7 +106,7 @@ class RippleTest {
     @Test
     void super_tough_10x10_v1_b100_2() {
         var board = Board.parse(KD_SUPER_TOUGH_10x10_v1_b100_2, 5);
-        new Ripple(board).solve();
+        new ByLogic(board).solve();
         var solution = new int[]{
                 4, 6, 1, 5, 3, 4, 1, 2, 3, 5,
                 5, 2, 6, 4, 2, 1, 5, 3, 7, 6,
@@ -118,18 +119,6 @@ class RippleTest {
                 2, 1, 6, 4, 2, 5, 3, 1, 4, 6,
                 3, 5, 2, 1, 4, 2, 6, 5, 3, 4, };
         assertSolution(board, solution);
-    }
-
-    private static void assertSolution(Board board, int[] solution) {
-        if (!board.isSolved()) {
-            System.out.println(board.toString(5));
-            throw new AssertionError("Board is not solved?!");
-        }
-        for (int c = board.cellCount() - 1; c >= 0; c--) {
-            assertEquals(solution[c],
-                         board.getCell(c),
-                         "Cell " + c + " is incorrect");
-        }
     }
 
 }
