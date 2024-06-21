@@ -3,11 +3,11 @@ package com.barneyb.games.ripple;
 import org.junit.jupiter.api.Test;
 
 import static com.barneyb.games.ripple.Boards.BITTY;
-import static com.barneyb.games.ripple.Boards.CHALLENGING_8x8_v1_b1_1;
-import static com.barneyb.games.ripple.Boards.EASY_7x7_v1_b1_1;
-import static com.barneyb.games.ripple.Boards.SUPER_TOUGH_10x10_v1_b100_2;
-import static com.barneyb.games.ripple.Boards.SUPER_TOUGH_10x10_v1_b1_1;
-import static com.barneyb.games.ripple.Boards.TOUGH_8x8_v1_b9_7;
+import static com.barneyb.games.ripple.Boards.KD_CHALLENGING_8x8_v1_b1_1;
+import static com.barneyb.games.ripple.Boards.KD_EASY_7x7_v1_b1_1;
+import static com.barneyb.games.ripple.Boards.KD_SUPER_TOUGH_10x10_v1_b100_2;
+import static com.barneyb.games.ripple.Boards.KD_SUPER_TOUGH_10x10_v1_b1_1;
+import static com.barneyb.games.ripple.Boards.KD_TOUGH_8x8_v1_b9_7;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,7 +15,7 @@ class RippleTest {
 
     @Test
     void visibleToAllPotentials() {
-        var board = Board.parse(TOUGH_8x8_v1_b9_7,
+        var board = Board.parse(KD_TOUGH_8x8_v1_b9_7,
                                 5);
         var r = new Ripple(board);
         assertTrue(r.singleCandidate());
@@ -39,7 +39,7 @@ class RippleTest {
 
     @Test
     void easy_7x7_v1_b1_1() {
-        var board = Board.parse(EASY_7x7_v1_b1_1, 5);
+        var board = Board.parse(KD_EASY_7x7_v1_b1_1, 5);
         new Ripple(board).solve();
         var solution = new int[]{
                 2, 1, 3, 1, 4, 2, 1,
@@ -54,7 +54,7 @@ class RippleTest {
 
     @Test
     void challenging_8x8_v1_b1_1() {
-        var board = Board.parse(CHALLENGING_8x8_v1_b1_1, 5);
+        var board = Board.parse(KD_CHALLENGING_8x8_v1_b1_1, 5);
         new Ripple(board).solve();
         var solution = new int[]{
                 2, 3, 1, 2, 4, 5, 2, 1,
@@ -70,7 +70,7 @@ class RippleTest {
 
     @Test
     void tough_8x8_v1_b9_7() {
-        var board = Board.parse(TOUGH_8x8_v1_b9_7, 5);
+        var board = Board.parse(KD_TOUGH_8x8_v1_b9_7, 5);
         new Ripple(board).solve();
         var solution = new int[]{
                 3, 4, 2, 1, 3, 1, 2, 1,
@@ -86,7 +86,7 @@ class RippleTest {
 
     @Test
     void super_tough_10x10_v1_b1_1() {
-        var board = Board.parse(SUPER_TOUGH_10x10_v1_b1_1, 5);
+        var board = Board.parse(KD_SUPER_TOUGH_10x10_v1_b1_1, 5);
         new Ripple(board).solve();
         var solution = new int[]{
                 3, 1, 2, 1, 5, 4, 3, 6, 1, 2,
@@ -104,7 +104,7 @@ class RippleTest {
 
     @Test
     void super_tough_10x10_v1_b100_2() {
-        var board = Board.parse(SUPER_TOUGH_10x10_v1_b100_2, 5);
+        var board = Board.parse(KD_SUPER_TOUGH_10x10_v1_b100_2, 5);
         new Ripple(board).solve();
         var solution = new int[]{
                 4, 6, 1, 5, 3, 4, 1, 2, 3, 5,
