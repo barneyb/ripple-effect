@@ -15,11 +15,8 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.singleton;
 
-public class ByLogic implements Ripple {
+public class ByLogic extends BaseRipple {
 
-    private final PrintStream out;
-
-    private final Board board;
     private final Set<Integer>[] candidatesByCell;
     private final int[][] cagesByCell;
     private final Queue<Integer> queue = new LinkedList<>();
@@ -30,8 +27,7 @@ public class ByLogic implements Ripple {
 
     public ByLogic(PrintStream out,
                    Board board) {
-        this.out = out;
-        this.board = board;
+        super(out, board);
         int cellCount = board.cellCount();
         cagesByCell = new int[cellCount][];
         //noinspection unchecked
@@ -50,8 +46,7 @@ public class ByLogic implements Ripple {
     }
 
     @Override
-    public void solve() {
-        var start = System.currentTimeMillis();
+    void solveInternal() {
         for (int i = 1; ; i++) {
             out.printf("- Round %d -%s%n", i, "-".repeat(20));
             if (Stream.<Logic>of(
@@ -65,10 +60,6 @@ public class ByLogic implements Ripple {
                 return;
             }
         }
-        var elapsed = System.currentTimeMillis() - start;
-        out.printf("[[ %s in %d ms ]]%n",
-                   board.isSolved() ? "Solved" : "Terminated",
-                   elapsed);
     }
 
     boolean singleCandidate() {
